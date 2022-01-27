@@ -48,7 +48,7 @@ The JOSE set of standards established JSON-based container formats for [Keys](ht
 
 This document defines a new container format similar in purpose and design to JSON Web Signature (JWS) called a _JSON Web Proof (JWP)_.  Unlike JWS, which integrity-protects only a single payload, JWP can integrity-protect multiple payloads, enabling those payloads to be selectively disclosed. It also specifies a proof-generation step, enabling privacy-preserving selection and computation.
 
-(Test change)
+(Test change #2)
 
 {mainmatter}
 
