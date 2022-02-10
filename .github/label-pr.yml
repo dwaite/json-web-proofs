@@ -1,6 +1,0 @@
-- regExp: "draft-jmiller-json-web-proof\\.md$"
-  labels: ["JWP"]
-- regExp: "draft-jmiller-json-proof-alogirhtms\\.md$"
-  labels: ["JPA"]
-- regExp: "draft-jmiller-json-proof-tokens\\.md$"
-  labels: ["JPT"]
