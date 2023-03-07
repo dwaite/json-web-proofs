@@ -89,7 +89,7 @@ For the JWS JSON serialization, multiple payloads are expressed via the new "pay
 
 For the JWS Compact serialization, multiple payloads are expressed by base64url-encoding each, then concatenating them into a single textual value with the tilde '~' character. This value is then expressed in lieu of a single base64-url encoded payload.
 
-   BASE64URL(UTF8(JWS Protected Header)) || '.' || 
+   BASE64URL(UTF8(JWS Protected Header)) || '.' ||
    BASE64URL(JWS Payload 1) ||
    ... '~' BASE64URL(JWS Payload n) || '.' ||
    BASE64URL(JWS Signature)
@@ -107,7 +107,7 @@ JWS Compact serialization represents omitted payloads as zero length payloads, a
 
 For algorithms which are not multiple payload aware, they are expected to continue to operate on a JWS signing input. When Multiple payloads are used, the JWS signing input is:
 
-   BASE64URL(JWS Protected Header) || '.' || 
+   BASE64URL(JWS Protected Header) || '.' ||
    BASE64URL(JWS Payload 1) ||
    ... '~' BASE64URL(JWS Payload n)
 
