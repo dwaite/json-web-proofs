@@ -1,7 +1,7 @@
 %%%
 title = "JSON Web Signatures (JWS) Multiple Payload Option"
 abbrev = "jws-multi-payload"
-docname = "draft-dwaite-multi-payload"
+docname = "draft-dwaite-multi-payload-latest"
 category = "info"
 ipr = "none"
 workgroup = "todo"
