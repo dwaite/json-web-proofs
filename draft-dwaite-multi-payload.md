@@ -1,5 +1,5 @@
 %%%
-title = "JSON Web Signatures (JWS) Multiple Payload Option
+title = "JSON Web Signatures (JWS) Multiple Payload Option"
 abbrev = "jws-multi-payload"
 docname = "draft-dwaite-multi-payload"
 category = "info"
@@ -9,7 +9,7 @@ keyword = ["jose", "jws"]
 
 [seriesInfo]
 name = "Internet-Draft"
-value = "draft-dwaite-multi-payload
+value = "draft-dwaite-multi-payload"
 status = "standard"
 
 [pi]
@@ -128,9 +128,8 @@ This document has no IANA actions.
 
 
 
---- back
+{backmatter}
 
 # Acknowledgments
-{:numbered="false"}
 
 TODO acknowledge.
