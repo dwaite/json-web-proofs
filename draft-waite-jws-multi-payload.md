@@ -68,7 +68,20 @@ This specification defines an operational mode for algorithms which are multi-pa
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [@RFC2119] [@RFC8174] when, and only when, they appear in all capitals, as shown here.
 
-This specification uses the same terminology as the "JSON Web Signature" [JWS] and "JSON Web Algorithms" [JWA] specifications.
+This specification will use the following conventions to describe expressions for transforms and serializations:
+
+1. A function is a transform or other operation which takes inputs and outputs a value will be described using a capitalized function name, with parameters folling in parenthesis as a comma-separated list, such as `FUNCTION(INPUT1, INPUT2)`. Functions may nest if the input to one function is the output of another.
+2. A constant value is indicated with a capitalized name and no parameterized list, such as `CONSTANT`
+3. Constants which are single 7-bit ASCII codes are indicated by the value, surrounded by single quotes, such as `'~'`
+4. Multiple values are concatenated into a single serialized form using two vertical line or "pipe" characters, e.g. `A || B`
+5. Optionality is indicated by surrounding an expression with square brackets, such as `A || [B || C]`
+
+The following additional conventions are used for expressing serialization of variable-length lists
+
+1. The values in a list, if needed, is indicated using a 1-based numerical suffix, such as `Payload 1`
+2. A loop is indicated by double square brackets, using a suffix of n, such as `Payload 1 || [[ '~' || Payload n]]`
+
+This specification uses the same terminology as the "JSON Web Signature" [JWS] and "JSON Web Algorithms" [JWA] specifications, as well as the `BASE64URL(OCTETS)`, `UTF8(STRING)`, and `ASCII(STRING)` encoding conventions (here referred to as functions.)
 
 # Multiple Payload Aware Algorithms
 
@@ -92,9 +105,7 @@ For the JWS Compact serialization, multiple payloads are expressed by base64url-
 ```
    BASE64URL(UTF8(JWS Protected Header))
    || '.' || BASE64URL(JWS Payload 1) ||
-   || '~' || BASE64URL(JWS Payload 2)
-   ...
-   || '~' || BASE64URL(JWS Payload n)
+   [[ '~' || BASE64URL(JWS Payload n) ]]
    || '.' || BASE64URL(JWS Signature)
 ```
 
@@ -116,10 +127,8 @@ For algorithms which are not multiple payload aware, they are expected to contin
 
 ```
    BASE64URL(JWS Protected Header)
-   || '.' || BASE64URL(JWS Payload 1)
-   || '~' || BASE64URL(JWS Payload 2)
-   ...
-   || '~' || BASE64URL(JWS Payload n)
+   || '.' || BASE64URL(JWS Payload 1) ||
+   [[ '~' || BASE64URL(JWS Payload 2) ]]
 ```
 
 # The "mp" Header Parameter
