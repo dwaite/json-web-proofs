@@ -1,7 +1,7 @@
 %%%
 title = "JSON Web Signatures (JWS) Multiple Payload Option"
 abbrev = "jws-multi-payload"
-docname = "draft-dwaite-multi-payload-latest"
+docname = "draft-waite-jws-multi-payload-latest"
 category = "info"
 ipr = "none"
 workgroup = "todo"
@@ -9,7 +9,7 @@ keyword = ["jose", "jws"]
 
 [seriesInfo]
 name = "Internet-Draft"
-value = "draft-dwaite-multi-payload"
+value = "draft-waite-jws-multi-payload"
 status = "standard"
 
 [pi]
