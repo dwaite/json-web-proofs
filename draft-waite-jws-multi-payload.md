@@ -128,7 +128,7 @@ For algorithms which are not multiple payload aware, they are expected to contin
 ```
    BASE64URL(JWS Protected Header)
    || '.' || BASE64URL(JWS Payload 1) ||
-   [[ '~' || BASE64URL(JWS Payload 2) ]]
+   [[ '~' || BASE64URL(JWS Payload n) ]]
 ```
 
 # The "mp" Header Parameter
@@ -141,12 +141,9 @@ The value `true` modifies the representation in JSON and compact encodings, as w
 
 TODO Security
 
-
 # IANA Considerations
 
 This document has no IANA actions.
-
-
 
 {backmatter}
 
