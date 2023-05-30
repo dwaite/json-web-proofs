@@ -66,7 +66,7 @@ This specification defines an operational mode for algorithms which are multi-pa
 
 # Conventions and Terminology
 
-{::boilerplate bcp14-tagged}
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [@RFC2119] [@RFC8174] when, and only when, they appear in all capitals, as shown here.
 
 This specification uses the same terminology as the "JSON Web Signature" [JWS] and "JSON Web Algorithms" [JWA] specifications.
 
@@ -89,27 +89,34 @@ For the JWS JSON serialization, multiple payloads are expressed via the new "pay
 
 For the JWS Compact serialization, multiple payloads are expressed by base64url-encoding each, then concatenating them into a single textual value with the tilde '~' character. This value is then expressed in lieu of a single base64-url encoded payload.
 
+```
    BASE64URL(UTF8(JWS Protected Header)) || '.' ||
    BASE64URL(JWS Payload 1) ||
    ... '~' BASE64URL(JWS Payload n) || '.' ||
    BASE64URL(JWS Signature)
-
+```
 
 For example, if the protected header coincidentally base64url-encoded to "HEADER", the three payloads base64url-encoded to "PAYLOAD1", "PAYLOAD2", and "PAYLOAD3", and the signature to "SIGN", the compact serialization would be:
 
+```
    HEADER.PAYLOAD1~PAYLOAD2~PAYLOAD3.SIGN
+```
 
 JWS Compact serialization represents omitted payloads as zero length payloads, and both base64url-encode to a zero length character sequence. If the second payload value had been omitted, the representation would have been:
 
+```
    HEADER.PAYLOAD1~~PAYLOAD3.SIGN
+```
 
 # JWS Signing Input
 
 For algorithms which are not multiple payload aware, they are expected to continue to operate on a JWS signing input. When Multiple payloads are used, the JWS signing input is:
 
+```
    BASE64URL(JWS Protected Header) || '.' ||
    BASE64URL(JWS Payload 1) ||
    ... '~' BASE64URL(JWS Payload n)
+```
 
 # The "mp" Header Parameter
 
