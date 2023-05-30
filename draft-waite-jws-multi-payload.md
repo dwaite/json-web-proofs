@@ -35,9 +35,9 @@ organization = "Ping Identity"
 initials = "M."
 surname = "Jones"
 fullname = "Michael B. Jones"
-organization = "Microsoft"
+organization = "individual"
   [author.address]
-  email = "mbj@microsoft.com"
+  email = "michael_b_jones@hotmail.com"
   uri = "https://self-issued.info/"
 
 %%%
@@ -131,7 +131,7 @@ For algorithms which are not multiple payload aware, they are expected to contin
    [[ '~' || BASE64URL(JWS Payload n) ]]
 ```
 
-# The "mp" Header Parameter
+# The "mp" Header Parameter {#mp-header}
 
 This Header Parameter indicates the signature is protecting multiple content payloads.
 
@@ -143,7 +143,17 @@ TODO Security
 
 # IANA Considerations
 
-This document has no IANA actions.
+## JSON Web Signature and Encryption Header Parameter Registration
+
+This specification registers the "mp" Header Parameter defined in Section (#mp-header) of this specification in the IANA " JSON Web Signature and Encryption Header Parameters" registry established by [JWS]
+
+### Registry Contents
+
+* Header Parameter Name: "mp"
+* Header Parameter Description: Multiple Payload Encoding
+   o  Header Parameter Usage Location(s): JWS
+   o  Change Controller: IESG
+   o  Specification Document(s): TBD
 
 {backmatter}
 
