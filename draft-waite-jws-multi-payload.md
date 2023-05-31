@@ -171,9 +171,23 @@ As this is the only valid combination of `"mp"` with `"b64"` as `false`, a multi
 
 Due to the difference in JSON serialization between the `payloads` value defined for multi-payload support and the `payload` value expected by the unencoded payload option, you MUST NOT use JSON serialization for transmission when operating with this combination of header parameters.
 
-# Indicating Multi-payload support
+# Indicating Multi-payload is required
 
-If the compatibility mode decribed above using unencoded payloads is not used, it is RECOMMENDED that a `"crit"` header including `"mp"` is used when the `"mp"` header is present with a value of `true`. The `"crit"` header MUST NOT include `"mp"` when the `"mp"` header is not present in the protected headers.
+When not using the compatibility mode described above, the JWS MUST use existing mechanisms to indicate the requirements of the message, and MUST NOT rely on side effects such as base64url decoding errors to prevent consumption by incompatible implementations.
+
+As such, the following two mechanisms are described to explicitly limit compatibility:
+
+1. A multi-payload-aware algorithm MUST only be supported by a multi-payload compatible JWS implementation. Implementations which do not understand multiple payloads will fail when they encounter an algorithm they do not support
+
+2. When an `"mp"` header of `true` is used with an algorithm that is not multiple payload aware, a `"crit"` header including `"mp"` MUST be supplied.
+
+# Detached payload content
+
+Appendix F of [JWS] describes how to represent JWSs with detached content, by applications omitting the payload in the transmitted serialization, and having the application reconsistitute the payload member to do integrity verification.
+
+The steps to detach all payloads from a multi-payload JWS are similar, with the caveat that the JSON serialization would now have the `payloads` key omitted in such a scenario.
+
+It is RECOMMENDED that applications describe when and how the detached content is to be used, taking particular caution around confusion that could result if only _some_ of the payloads have been detached.
 
 # Security Considerations
 
