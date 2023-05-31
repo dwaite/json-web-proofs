@@ -98,7 +98,11 @@ Algorithms which are not aware of multiple payloads are instead expected to oper
 
 # Multi Payload Serializations
 
+## JSON Serialization
+
 For the JWS JSON serialization, multiple payloads are expressed via the new "payloads" member, which is an array where each entry is either a base64url-encoded content payload value or the JSON value `null`. Implementations MUST verify the "payload" member is absent when "payloads" is present.
+
+## Compact Serialization
 
 For the JWS Compact serialization, multiple payloads are expressed by base64url-encoding each, then concatenating them into a single textual value with the tilde '~' character. This value is then expressed in lieu of a single base64-url encoded payload.
 
@@ -136,6 +140,40 @@ For algorithms which are not multiple payload aware, they are expected to contin
 This Header Parameter indicates the signature is protecting multiple content payloads.
 
 The value `true` modifies the representation in JSON and compact encodings, as well as the JWS signing input, to to the rules above.
+
+Multi-payload aware algorithms cannot operate on JWS signing input, and MUST be assumed to be operating as if `"mp"` was specified as `true`. A `"mp"` header of `false` is not legal in this scenario, and it is RECOMMENDED that the `"mp"` header not be specified.
+
+Applications which do not specify multi-payload behavior can be assumed to be operating in a mode where `"mp"` is `false`. Applications MAY either indicate this value be specified explicitly, or be assumed by context.
+
+# Interactions with Unencoded Payload Option
+
+[RFC7797] specifies the unencoded payload option, which allows for payloads that can be expressed without base64url-encoding to skip the payload transformation, altering transforms as well as the JWS signed input. This is done via the `"b64"` protected header being `true`. The payload in such a case can include both the base64url alphabet as well as the tilde character `~`.
+
+As the unencoded payload option describes how to encoded multiple payloads, the `"b64"` protected header does not have an effect on multi-payload processing. That said, the two headers have compatible payloads and JWS signing input, by noting such an unencoded payload input is a _combined payload serialization_ of the multi-payload input, defined as:
+
+```
+   BASE64URL(JWS Payload 1) ||
+   [[ '~' || BASE64URL(JWS Payload n) ]]
+```
+
+## Compatibility mode with implementations without multi-payload support
+
+The unencoded payload option can be used in concert with multi-payload support when using algorithms which are not multi-payload aware, and communicating with compact serialization. This provides compatibility with JWS implementations without multi-payload support, which will fall back to interpreting the payload as a combined payload serialization. For such implementations, another layer of the application would be responsible for decomposing and interpreting the combined payload.
+
+When operating in compatibility mode, the protected header should indicate:
+
+* a non multi-payload-aware algorithm
+* a `"mp"` header of `true`, indicating that multiple payloads for JWS implmentations which support such a feature
+* a `"b64"` header of `false`, indicating that the payload is not encoded
+* a `"crit"` header including `"b64"` but not including `"mp"`.
+
+As this is the only valid combination of `"mp"` with `"b64"` as `false`, a multi-payload aware JWS implementation SHOULD consider that they satisfy the `"crit"` requirement for `"b64"`, even if they otherwise do not support unencoded payloads.
+
+Due to the difference in JSON serialization between the `payloads` value defined for multi-payload support and the `payload` value expected by the unencoded payload option, you MUST NOT use JSON serialization for transmission when operating with this combination of header parameters.
+
+# Indicating Multi-payload support
+
+If the compatibility mode decribed above using unencoded payloads is not used, it is RECOMMENDED that a `"crit"` header including `"mp"` is used when the `"mp"` header is present with a value of `true`. The `"crit"` header MUST NOT include `"mp"` when the `"mp"` header is not present in the protected headers.
 
 # Security Considerations
 
