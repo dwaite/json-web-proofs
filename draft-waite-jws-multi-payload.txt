@@ -2,7 +2,7 @@
 
 
 
-todo                                                            D. Waite
+                                                                D. Waite
                                                                J. Miller
                                                            Ping Identity
                                                                 M. Jones
@@ -11,7 +11,7 @@ todo                                                            D. Waite
 
 
            JSON Web Signatures (JWS) Multiple Payload Option
-                     draft-waite-jws-multi-payload
+                  draft-waite-jws-multi-payload-latest
 
 Abstract
 
