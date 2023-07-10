@@ -1,14 +1,15 @@
 %%%
 title = "JSON Web Signatures (JWS) Multiple Payload Option"
 abbrev = "jws-multi-payload"
+ipr = "trust200902"
+keyword = ["jose", "jws"]
 docname = "draft-waite-jws-multi-payload"
 category = "info"
-ipr = "none"
-keyword = ["jose", "jws"]
 
 [seriesInfo]
 name = "Internet-Draft"
 value = "draft-waite-jws-multi-payload-latest"
+stream = "IETF"
 status = "informational"
 
 [pi]
