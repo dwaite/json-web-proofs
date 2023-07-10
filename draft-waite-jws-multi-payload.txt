@@ -7,7 +7,7 @@ todo                                                            D. Waite
                                                            Ping Identity
                                                                 M. Jones
                                                               individual
-                                                             31 May 2023
+                                                            10 July 2023
 
 
            JSON Web Signatures (JWS) Multiple Payload Option
@@ -47,14 +47,15 @@ Table of Contents
    7.  Interactions with Unencoded Payload Option
      7.1.  Compatibility mode with implementations without
            multi-payload support
-   8.  Indicating Multi-payload support
-   9.  Security Considerations
-   10. IANA Considerations
-     10.1.  JSON Web Signature and Encryption Header Parameter
+   8.  Indicating Multi-payload is required
+   9.  Detached payload content
+   10. Security Considerations
+   11. IANA Considerations
+     11.1.  JSON Web Signature and Encryption Header Parameter
             Registration
-       10.1.1.  Registry Contents
-   11. Normative References
-   12. Informative References
+       11.1.1.  Registry Contents
+   12. Normative References
+   13. Informative References
    Appendix A.  Acknowledgments
    Authors' Addresses
 
@@ -281,28 +282,55 @@ Table of Contents
    serialization for transmission when operating with this combination
    of header parameters.
 
-8.  Indicating Multi-payload support
+8.  Indicating Multi-payload is required
 
-   If the compatibility mode decribed above using unencoded payloads is
-   not used, it is RECOMMENDED that a "crit" header including "mp" is
-   used when the "mp" header is present with a value of true.  The
-   "crit" header MUST NOT include "mp" when the "mp" header is not
-   present in the protected headers.
+   When not using the compatibility mode described above, the JWS MUST
+   use existing mechanisms to indicate the requirements of the message,
+   and MUST NOT rely on side effects such as base64url decoding errors
+   to prevent consumption by incompatible implementations.
 
-9.  Security Considerations
+   As such, the following two mechanisms are described to explicitly
+   limit compatibility:
+
+   1.  A multi-payload-aware algorithm MUST only be supported by a
+       multi-payload compatible JWS implementation.  Implementations
+       which do not understand multiple payloads will fail when they
+       encounter an algorithm they do not support
+
+   2.  When an "mp" header of true is used with an algorithm that is not
+       multiple payload aware, a "crit" header including "mp" MUST be
+       supplied.
+
+9.  Detached payload content
+
+   Appendix F of [JWS] describes how to represent JWSs with detached
+   content, by applications omitting the payload in the transmitted
+   serialization, and having the application reconsistitute the payload
+   member to do integrity verification.
+
+   The steps to detach all payloads from a multi-payload JWS are
+   similar, with the caveat that the JSON serialization would now have
+   the payloads key omitted in such a scenario.
+
+   It is RECOMMENDED that applications describe when and how the
+   detached content is to be used, taking particular caution around
+   confusion that could result if only _some_ of the payloads have been
+   detached.
+
+10.  Security Considerations
 
    TODO Security
 
-10.  IANA Considerations
+11.  IANA Considerations
 
-10.1.  JSON Web Signature and Encryption Header Parameter Registration
+11.1.  JSON Web Signature and Encryption Header Parameter Registration
 
    This specification registers the "mp" Header Parameter defined in
    Section Section 6 of this specification in the IANA " JSON Web
    Signature and Encryption Header Parameters" registry established by
    [JWS]
 
-10.1.1.  Registry Contents
+11.1.1.  Registry Contents
 
    *  Header Parameter Name: "mp"
 
@@ -310,13 +338,13 @@ Table of Contents
       Parameter Usage Location(s): JWS o Change Controller: IESG o
       Specification Document(s): TBD
 
-11.  Normative References
+12.  Normative References
 
    [RFC7519]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web Token
               (JWT)", RFC 7519, DOI 10.17487/RFC7519, May 2015,
               <https://www.rfc-editor.org/info/rfc7519>.
 
-12.  Informative References
+13.  Informative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
