@@ -1,3 +1,6 @@
+.DS_Store
+.target.mk
+
 *.html
 *.pdf
 *.redxml
@@ -7,9 +10,9 @@
 *~
 .tags
 /*-[0-9][0-9].xml
+/.*.mk
 /.gems/
 /.refcache
-/.targets.mk
 /.venv/
 /.vscode/
 /lib
