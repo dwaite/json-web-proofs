@@ -2,13 +2,12 @@
 
 
 
-jose                                                           J. Miller
-Internet-Draft                                             Ping Identity
-Intended status: Standards Track                                M. Jones
-Expires: 11 January 2024                                      individual
-                                                                D. Waite
+jose                                                            M. Jones
+Internet-Draft                                    Self-Issued Consulting
+Intended status: Standards Track                                D. Waite
+Expires: 17 August 2025                                        J. Miller
                                                            Ping Identity
-                                                            10 July 2023
+                                                        13 February 2025
 
 
                             JSON Proof Token
@@ -19,11 +18,10 @@ Abstract
    JSON Proof Token (JPT) is a compact, URL-safe, privacy-preserving
    representation of claims to be transferred between three parties.
    The claims in a JPT are encoded as base64url-encoded JSON objects
-   that are used as the payloads of a JSON Web Proof (JWP)
-   (https://www.ietf.org/archive/id/draft-ietf-jose-json-web-proof-
-   00.html) structure, enabling them to be digitally signed and
-   selectively disclosed.  JPTs also support reusability and
-   unlinkability when using Zero-Knowledge Proofs (ZKPs).
+   that are used as the payloads of a JSON Web Proof (JWP) structure,
+   enabling them to be digitally signed and selectively disclosed.  JPTs
+   also support reusability and unlinkability when using Zero-Knowledge
+   Proofs (ZKPs).
 
 Status of This Memo
 
@@ -40,11 +38,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 11 January 2024.
+   This Internet-Draft will expire on 17 August 2025.
 
 Copyright Notice
 
-   Copyright (c) 2023 IETF Trust and the persons identified as the
+   Copyright (c) 2025 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -67,14 +65,22 @@ Table of Contents
      4.3.  Familiarity
      4.4.  Proofs
    5.  Claim Names
-   6.  Claims
-   7.  Payloads
-     7.1.  Disclosed
-     7.2.  Proof Methods
-   8.  Example JPT
-   9.  Security Considerations
-   10. IANA Considerations
-   11. Informative References
+   6.  Claims Header Parameter
+   7.  Claims ID ("cid") JWP Header Parameter
+   8.  Presented Claims and Proofs
+     8.1.  Disclosed
+     8.2.  Undisclosed
+     8.3.  Proof Methods
+   9.  Example JPTs
+   10. Security Considerations
+   11. IANA Considerations
+     11.1.  JSON Web Proof Header Parameters Registration
+       11.1.1.  Registry Contents
+         11.1.1.1.  "claims" (Claims) Header Parameter
+         11.1.1.2.  "cid" (Claims ID) Header Parameter
+   12. References
+     12.1.  Normative References
+     12.2.  Informative References
    Appendix A.  Acknowledgements
    Appendix B.  Document History
    Authors' Addresses
@@ -85,19 +91,19 @@ Table of Contents
    intended to be used in the same ways as a JSON Web Token (JWT), but
    with additional support for selective disclosure and unlinkability.
    JPTs encode claim values to be transmitted as payloads of a JSON Web
-   Proof (JWP) (https://www.ietf.org/archive/id/draft-ietf-jose-json-
-   web-proof-00.html).  JPTs are always represented using the JWP
-   Compact Serialization.  The corresponding claim names are not
-   transmitted in the payloads and are stored in a separate structure
-   that can be externalized and shared across multiple JPTs.
+   Proof (JWP) [I-D.ietf-jose-json-web-proof].  JPTs are always
+   represented using the JWP Compact Serialization.  The corresponding
+   claim names are not transmitted in the payloads and are stored in a
+   separate structure that can be externalized and shared across
+   multiple JPTs.
 
-   |  Editor's Note: This draft is still early and incomplete, there
+   |  Editor's Note: This draft is still early and incomplete.  There
    |  will be significant changes to the algorithms as currently defined
    |  here.  Please do not use any of these definitions or examples for
    |  anything except personal experimentation and learning.
-   |  Contributions and feedback are welcome at https://github.com/json-
-   |  web-proofs/json-web-proofs (https://github.com/json-web-proofs/
-   |  json-web-proofs).
+   |  Contributions and feedback are welcomed at https://github.com/
+   |  ietf-wg-jose/json-web-proof (https://github.com/ietf-wg-jose/json-
+   |  web-proof).
 
 2.  Conventions and Definitions
 
@@ -119,7 +125,7 @@ Table of Contents
 
    The rationale behind the design for JSON Proof Tokens is important
    when considering how it is structured.  These sections detail the
-   underlying reasoning for the approach defined by JPTs.
+   underlying reasoning informing the JPT design.
 
 4.1.  Unlinkability
 
@@ -144,18 +150,19 @@ Table of Contents
 
    While JWPs provide the underling structure for easily supporting
    selective disclosure, JPTs must go a step further to ensure that
-   applications can effectively provide choice and consent on exactly
-   what is being disclosed.  Software using JWPs must know the mappings
-   from payloads to claims.  JPTs do not support disclosing claims that
-   are intended to be private from the issuer to the relying party.  All
-   disclosed payloads MUST be mapped to claims and made accessible to
-   the application.
+   holders can effectively provide choice and consent on exactly what is
+   being disclosed.  Software using JWPs MUST know the mappings from
+   payloads to claims.  All disclosed payloads MUST be mapped to claims
+   and made accessible to the application.  Holders SHOULD understand
+   the semantics of all potentially disclosed claims to the extent
+   needed to decide whether to disclose them.  JPTs SHOULD NOT contain
+   claims that are intended only for a specific verifier.
 
 4.3.  Familiarity
 
    JPTs are intended to be as close to a JWT as possible in order to
    provide the simplest transition for any JWT-based system to add
-   support for a JPT.
+   support for JPTs.
 
    Although there are some stark differences in the lifecycle of a JPT,
    from the application's perspective, the interface to a JPT can be
@@ -170,7 +177,7 @@ Table of Contents
 
 4.4.  Proofs
 
-   In order to generate a variety of efficient ZKPs of knowledge, range,
+   To generate a variety of efficient ZKPs of knowledge, range,
    membership, or other predicates, it is essential that each individual
    payload is only a single claim value.  This greatly simplifies the
    task of linking a derived proof of a given claim to the specific
@@ -181,41 +188,32 @@ Table of Contents
 
 5.  Claim Names
 
-   It is suggested that the claim names used with JPTs come from those
-   in the IANA JSON Web Token Claims Registry, when those fit the
-   application's needs.
+   It is RECOMMENDED that the claim names used with JPTs come from those
+   in the IANA JSON Web Token Claims Registry [IANA.JWT.Claims]
+   established by [RFC7519], when those fit the application's needs.
 
-6.  Claims
+6.  Claims Header Parameter
 
-   Using a JSON Proof Token requires combining information from two
-   sources: the claim names and the payloads.  The simplest solution is
-   to list the claim names in an ordered array that aligns with the
-   included payloads.  This claims array can be conveniently included in
-   the JWP Protected Header using the claims key.
+   A JSON Proof Token assigns each playload a claim name.  Payloads MUST
+   each have a negotiated and understood claim name within the
+   application context.  The simplest solution to establish payload
+   claim names is as an ordered array that aligns with the included
+   payloads.  This claims array can be conveniently included in the
+   Claims header parameter.
 
-   When the claims array is stored in the header, any variations of it
-   are disclosed to the verifier and can be used to correlate and link
-   usages.  Given the privacy design considerations around linkability
-   it is recommended that the claims are defined external to an
-   individual JPT and either referenced or known by the application
-   context.
-
-   In order to facilitate this external definition of the claim names,
-   an additional cid key is defined with a required digest value
-   calculated as defined here.  This cid can be used similar to a kid in
-   order to ensure externally resolve and then verify that the correct
-   list of claim names is being used when processing the payloads
-   containing the claim values.
-
-   If there is an associated JWK containing the signing key information,
-   the claims key is also registered there as a convenient location for
-   the claim names.
+   The claims Header Parameter is an array listing the Claim Names
+   corresponding to the JWP payloads, in the same order as the payloads.
+   Each array value is a Claim Name, as defined in [RFC7519].  Use of
+   this Header Parameter is OPTIONAL.
 
    All payloads are claim values and MUST be the base64url encoding of
-   the UTF-8 representation of a JSON value.
+   the UTF-8 representation of a JSON value.  That said, predicate
+   proofs derived from payload values are not represented as claims;
+   they are contained in the presentation proof using algorithm-specific
+   representations.
 
-   The following is an example JWP Protected Header that includes a
-   claims array:
+   The following is an example JWP Issuer Protected Header that includes
+   a claims property:
 
    {
      "kid": "HjfcpyjuZQ-O8Ye2hQnNbT9RbbnrobptdnExR0DUjU8",
@@ -225,58 +223,148 @@ Table of Contents
        "exp",
        "family_name",
        "given_name",
-       "email"
+       "email",
+       "address",
+       "age_over_21"
      ]
    }
 
-7.  Payloads
+   In this example, the "iat" and "exp" would be JSON-formatted numbers,
+   "family_name", "given_name" and "email" would be JSON strings (in
+   quotes), "address" would be a JSON object and "age_over_21" would be
+   expected to be either true or false.
 
-   |  Editor's Note: This section is significantly incomplete, use it
-   |  only as an indicator of the intended direction.
+7.  Claims ID ("cid") JWP Header Parameter
 
-   Application resolves each claim as required when processing the JPT.
-   Resolution can result in one of three things: 1.  A disclosed JSON
-   value 2.  A custom proof method 3.  A null value
+   A Claims ID ("cid") value can be used as an identifier for a set of
+   claim names without explicitly listing them.
 
-7.1.  Disclosed
+   The structure of the cid value is unspecified.  Its value MUST be a
+   case-sensitive string.  Use of this JWP Header Parameter is OPTIONAL.
 
-   Always an octet string of valid JSON text.
+   The cid can be used similarly to a kid in order to ensure that is it
+   possible to externally resolve and then verify that the correct list
+   of claim names is being used when processing the payloads containing
+   the claim values.
 
-7.2.  Proof Methods
+   If there is an associated JWK containing the signing key information,
+   the claims key is also registered there as a convenient location for
+   the claim names.
 
-   *  proof methods can be returned instead of a disclosed payload
+   When the claims array is transferred as a property in the Issuer
+   Protected Header, any variations of that array between JWP will be
+   visible to the verifier, and can leak information about the subject
+   or provide an additional vector for linkability.  Given the privacy
+   design considerations around linkability, it is RECOMMENDED that the
+   claims are defined external to an individual JPT and either
+   referenced or known by the application context.
 
-   *  these are generated by the algorithm from information in the JWP's
-      proof value
+   The following is an example JWP Protected Header that includes a cid:
 
-   *  a proof method may be custom based on the capabilities of the
-      algorithm
+   {
+     "kid": "HjfcpyjuZQ-O8Ye2hQnNbT9RbbnrobptdnExR0DUjU8",
+     "alg": "BBS",
+     "cid": "guA8PAI14Gkn4273f1rR606yMbRMFg4y"
+   }
 
-   *  define common proof method types available?
+8.  Presented Claims and Proofs
 
+   Each claim in the issued form of the JPT results in one of three
+   things in the presented form of the JPT: 1.  A disclosed JSON value.
+   1.  An indicator that the value was not disclosed. 1.  An algorithm-
+   specific proof method.
+
+8.1.  Disclosed
+
+   A disclosed payload is represented as a UTF-encoded octet string
+   representing a valid JSON value.
+
+8.2.  Undisclosed
+
+   The placeholder indicating that a payload was not disclosed is
+   represented as described in Section 6 (Serializations) of
+   [I-D.ietf-jose-json-web-proof].
+
+8.3.  Proof Methods
+
+   Proof methods can be returned instead of a disclosed payload.  These
+   are generated in an algorithm-specific manner from information in the
+   JWP's proof value.
+
+   A proof method may be custom based on the capabilities of the
+   algorithm.
+
+   *  TBD: Describe common proof method types available?
       -  range
-
       -  membership
-
       -  time
-
       -  knowledge
-
       -  linking
 
-8.  Example JPT
+9.  Example JPTs
 
-   See the JSON Web Proof draft appendix.
+   See the examples in Appendix A.1 of
+   [I-D.ietf-jose-json-proof-algorithms].
 
-9.  Security Considerations
+10.  Security Considerations
 
    *  Protected Header Minimization
 
-10.  IANA Considerations
+11.  IANA Considerations
 
-   This document has no IANA actions.
+11.1.  JSON Web Proof Header Parameters Registration
 
-11.  Informative References
+   This section registers the following JWP Header Parameter in the IANA
+   "JSON Web Proof Header Parameters" registry established by
+   [I-D.ietf-jose-json-web-proof].
+
+11.1.1.  Registry Contents
+
+11.1.1.1.  "claims" (Claims) Header Parameter
+
+   *  Header Parameter Name: Claims
+   *  Header Parameter JSON Label: claims
+   *  Header Parameter CBOR Label: 10
+   *  Header Parameter Usage Location(s): Issued
+   *  Change Controller: IETF
+   *  Specification Document(s): Section 6 of this specification
+
+11.1.1.2.  "cid" (Claims ID) Header Parameter
+
+   *  Header Parameter Name: Claims ID
+   *  Header Parameter JSON Label: cid
+   *  Header Parameter CBOR Label: 11
+   *  Header Parameter Usage Location(s): Issued
+   *  Change Controller: IETF
+   *  Specification Document(s): Section 7 of this specification
+
+12.  References
+
+12.1.  Normative References
+
+   [I-D.ietf-jose-json-web-proof]
+              Waite, D., Jones, M. B., and J. Miller, "JSON Web Proof",
+              Work in Progress, Internet-Draft, draft-ietf-jose-json-
+              web-proof-07, 21 October 2024,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-jose-
+              json-web-proof-07>.
+
+   [RFC7519]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web Token
+              (JWT)", RFC 7519, DOI 10.17487/RFC7519, May 2015,
+              <https://www.rfc-editor.org/info/rfc7519>.
+
+12.2.  Informative References
+
+   [I-D.ietf-jose-json-proof-algorithms]
+              Jones, M. B., Waite, D., and J. Miller, "JSON Proof
+              Algorithms", Work in Progress, Internet-Draft, draft-ietf-
+              jose-json-proof-algorithms-07, 21 October 2024,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-jose-
+              json-proof-algorithms-07>.
+
+   [IANA.JWT.Claims]
+              IANA, "JSON Web Token Claims",
+              <https://www.iana.org/assignments/jwt>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -289,11 +377,48 @@ Table of Contents
 
 Appendix A.  Acknowledgements
 
-   TBD
+   This work was incubated in the DIF Applied Cryptography Working Group
+   (https://identity.foundation/working-groups/crypto.html).
+
+   We would like to thank Brent Zundel for his valuable contributions to
+   this specification.
 
 Appendix B.  Document History
 
    [[ To be removed from the final specification ]]
+
+   -07
+
+   *  Changing primary editor
+   *  Move claims definition from JWP, to live beside cid
+   *  Update cid registry entry to assign CBOR label
+
+   -06
+
+   *  Update reference to new repository home
+   *  Fixed #99: Discussed issued and presented forms of JPTs.
+
+   -05
+
+   *  Define and register Claims ID JWP Header Parameter.
+
+   -04
+
+   *  Refactoring figures and examples to be built from a common set
+      across all three documents
+
+   -03
+
+   *  Improvements resulting from a full proofreading.
+   *  Added examples of JSON object and JSON boolean claims.
+
+   -02
+
+   *  Update example to use the current BBS algorithm
+
+   -01
+
+   *  Correct cross-references within group.
 
    -00
 
@@ -302,13 +427,8 @@ Appendix B.  Document History
 
 Authors' Addresses
 
-   Jeremie Miller
-   Ping Identity
-   Email: jmiller@pingidentity.com
-
-
    Michael B. Jones
-   individual
+   Self-Issued Consulting
    Email: michael_b_jones@hotmail.com
    URI:   https://self-issued.info/
 
@@ -316,3 +436,8 @@ Authors' Addresses
    David Waite
    Ping Identity
    Email: dwaite+jwp@pingidentity.com
+
+
+   Jeremie Miller
+   Ping Identity
+   Email: jmiller@pingidentity.com
