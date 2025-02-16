@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-01-30T00:23:31.338189+00:00",
+  "timestamp": "2025-02-16T00:27:03.078347+00:00",
   "repo": "dwaite/json-web-proofs",
   "labels": [
     {
@@ -117,10 +117,10 @@
       ],
       "body": "",
       "createdAt": "2022-01-27T00:36:43Z",
-      "updatedAt": "2023-05-30T21:39:57Z",
+      "updatedAt": "2025-02-13T03:44:06Z",
       "baseRepository": "dwaite/json-web-proofs",
       "baseRefName": "main",
-      "baseRefOid": "e5fd209b0c8e197fdf480aedb2b0c7df8e248fad",
+      "baseRefOid": "8335cc680cafc1eac638402fe34092cbc75ca81a",
       "headRepository": "dwaite/json-web-proofs",
       "headRefName": "remove-test-text",
       "headRefOid": "ec3fe5098cf8f66278da45d280d0b6a3af5e0c07",
